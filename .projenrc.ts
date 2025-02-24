@@ -211,6 +211,7 @@ const repoProject = new yarn.Monorepo({
       },
     },
   },
+
   buildWorkflowOptions: {
     preBuildSteps: [
       // Need this for the init tests
@@ -237,10 +238,22 @@ repoProject.eslint = new pj.javascript.Eslint(repoProject, {
   fileExtensions: ['.ts', '.tsx'],
   lintProjenRc: false,
 });
+
 // always lint projen files as part of the build
 if (repoProject.eslint?.eslintTask) {
   repoProject.tasks.tryFind('build')?.spawn(repoProject.eslint?.eslintTask);
 }
+
+// always scan for git secrets before building
+const gitSecretsScan = repoProject.addTask('git-secrets-scan', {
+  steps: [
+    {
+      exec: '/bin/bash ./projenrc/git-secrets-scan.sh',
+    },
+  ],
+});
+
+repoProject.tasks.tryFind('build')?.prependSpawn(gitSecretsScan);
 
 new AdcPublishing(repoProject);
 

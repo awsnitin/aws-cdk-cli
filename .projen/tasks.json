@@ -4,6 +4,9 @@
       "name": "build",
       "steps": [
         {
+          "spawn": "git-secrets-scan"
+        },
+        {
           "spawn": "default"
         },
         {
@@ -80,6 +83,14 @@
         {
           "exec": "eslint --ext .ts,.tsx --fix --no-error-on-unmatched-pattern $@ projenrc .projenrc.ts",
           "receiveArgs": true
+        }
+      ]
+    },
+    "git-secrets-scan": {
+      "name": "git-secrets-scan",
+      "steps": [
+        {
+          "exec": "/bin/bash ./projenrc/git-secrets-scan.sh"
         }
       ]
     },
